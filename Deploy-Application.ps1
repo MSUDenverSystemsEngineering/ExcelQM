@@ -69,15 +69,15 @@ Try {
     ##* VARIABLE DECLARATION
     ##*===============================================
     ## Variables: Application
-    [string]$appVendor = ''
-    [string]$appName = ''
-    [string]$appVersion = ''
-    [string]$appArch = ''
+    [string]$appVendor = 'Pearson'
+    [string]$appName = 'Excel QM'
+    [string]$appVersion = '5.3'
+    [string]$appArch = 'x64'
     [string]$appLang = 'EN'
     [string]$appRevision = '01'
     [string]$appScriptVersion = '1.0.0'
-    [string]$appScriptDate = 'XX/XX/20XX'
-    [string]$appScriptAuthor = '<author name>'
+    [string]$appScriptDate = '05/02/2023'
+    [string]$appScriptAuthor = 'Will Jarvill'
     ##*===============================================
     ## Variables: Install Titles (Only set here to override defaults set by the toolkit)
     [string]$installName = ''
@@ -144,7 +144,7 @@ Try {
         [String]$installPhase = 'Pre-Installation'
 
         ## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
-        Show-InstallationWelcome -CloseApps 'processName' -CheckDiskSpace -PersistPrompt
+        Show-InstallationWelcome -CloseApps 'excel' -CheckDiskSpace -PersistPrompt
 
         ## Show Progress Message (with the default message)
         Show-InstallationProgress
@@ -168,7 +168,8 @@ Try {
         }
 
         ## <Perform Installation tasks here>
-
+        $exitCode = Execute-MSI -Path "$dirFiles\ExcelOMQMv5.3.Render.msi" -Parameters "/qn" -PassThru
+        If (($exitCode.ExitCode -ne "0") -and ($mainExitCode -ne "3010")) { $mainExitCode = $ExitCode.ExitCode}
 
         ##*===============================================
         ##* POST-INSTALLATION
@@ -176,7 +177,9 @@ Try {
         [String]$installPhase = 'Post-Installation'
 
         ## <Perform Post-Installation tasks here>
-
+        If (Test-Path "$env:Public\Desktop\Excel QM v5.3.lnk") {
+            Remove-Item "$env:Public\Desktop\Excel QM v5.3.lnk" -Force
+        }
         ## Display a message at the end of the install
         ## See original PSADT Deploy-Application.ps1 file from GitHub if you want to use this feature
     }
@@ -187,7 +190,7 @@ Try {
         [String]$installPhase = 'Pre-Uninstallation'
 
         ## Show Welcome Message, close Internet Explorer with a 60 second countdown before automatically closing
-        Show-InstallationWelcome -CloseApps 'processName' -CloseAppsCountdown 60
+        Show-InstallationWelcome -CloseApps 'excel' -CloseAppsCountdown 60
 
         ## Show Progress Message (with the default message)
         Show-InstallationProgress
@@ -209,7 +212,7 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-
+        Execute-MSI -Action Uninstall -Path '{B17E9926-78C4-4D4E-AC3E-560833383CE5}' -PassThru -ContinueOnError $true
 
         ##*===============================================
         ##* POST-UNINSTALLATION
@@ -227,7 +230,7 @@ Try {
         [String]$installPhase = 'Pre-Repair'
 
         ## Show Welcome Message, close Internet Explorer with a 60 second countdown before automatically closing
-        Show-InstallationWelcome -CloseApps 'processName' -CloseAppsCountdown 60
+        Show-InstallationWelcome -CloseApps 'excel' -CloseAppsCountdown 60
 
         ## Show Progress Message (with the default message)
         Show-InstallationProgress
@@ -276,8 +279,8 @@ Catch {
 # SIG # Begin signature block
 # MIImVgYJKoZIhvcNAQcCoIImRzCCJkMCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDB5bVOvQ4Dzmdk
-# 6vQ9QovPG3aaImGnocZ2/tj4T8IQ76CCH8EwggVvMIIEV6ADAgECAhBI/JO0YFWU
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCA/RAtz0lAOLye6
+# 1rr+Y8w+yTpbdsVlnFWwZxe8D6rTS6CCH8EwggVvMIIEV6ADAgECAhBI/JO0YFWU
 # jTanyYqJ1pQWMA0GCSqGSIb3DQEBDAUAMHsxCzAJBgNVBAYTAkdCMRswGQYDVQQI
 # DBJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcMB1NhbGZvcmQxGjAYBgNVBAoM
 # EUNvbW9kbyBDQSBMaW1pdGVkMSEwHwYDVQQDDBhBQUEgQ2VydGlmaWNhdGUgU2Vy
@@ -451,32 +454,32 @@ Catch {
 # ZDErMCkGA1UEAxMiU2VjdGlnbyBQdWJsaWMgQ29kZSBTaWduaW5nIENBIFIzNgIR
 # AKVN33D73PFMVIK48rFyyjEwDQYJYIZIAWUDBAIBBQCggYQwGAYKKwYBBAGCNwIB
 # DDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEE
-# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgCa2HQFWNLLms
-# wN/zb4VOu3Yn59RhVAMeQieQfz7FBEUwDQYJKoZIhvcNAQEBBQAEggGAKffqb2e1
-# CR2o3GmN8lQ51rkHtwHTyWoRoPtJ48dC3WkLKWG7vHX81T7NQ0ol16Y/D9l/ZK0e
-# 2uLGBhhv9vqIQ10OLVUS3wo/6kcyPfmN120T6HzPB/SXy7pkFV0ZCuvuUnBKK5FY
-# qGvBAZ2V5BPWhbK8YTsB0RSmUYDpF89fii8jpSgqn8YXhg8CVgSwqJGtPH98WMK9
-# v3bJWhKuVVkueNB+JfOvsayA6ZAepdT+V1kUS18uRRS5MQz7DEI9798XmYNNbAT9
-# KSd3re1u/ShfriLqyYU5zoix+bUjZC7C/7duPzxOk8m40PfWNlZFNHmXD/feHAZ1
-# R/fZF6D/oqR0No6UX+8Nz37Fw55nwi6pYf6nF0OIAKYnq7NN0hWcP1itHd5LBsy/
-# qij7TfN6olNdVvYyB5WsxLAxl54oNVMuNvXq7crg/frjky4G5usVZhxwL0BPtP7K
-# aQpgJEfuggci3TsyDyRASLN9OGWN0MwuvYuHGQ6gThv+xN9b4MAw1zpeoYIDTDCC
+# AYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgCta2mferXmId
+# PS+G9wHspCQgbBWljy4Zak0mMOPNRGAwDQYJKoZIhvcNAQEBBQAEggGAmzAcBccc
+# tCr686ehy5FVW1+RUAbCLUd2EA1WNK21SxXAKU6bgaaCWQrmSnoKAjFYLugKOQNM
+# D4kEWhyWAaMpFxPa3b+r6WNgxnC57wWQjhNtUgs6G/p68AyzYbBSKEmN/Drz9mJE
+# 2SuDVQ61wn1ynNuG/rGMt+BWxGFZK+ya1QypBWNFbhINT8OlhbTdf2cpTxc2XEq2
+# oTK2E0DEuzvK22K0y1juMpr/Rvg4EpkkeqUMvJhH2IG7Vr/LljLfaQvlPOdWs+3Z
+# kdAU0xo499rQyQsbzlF+M3KhPud0Y3jdt+3zPZGz1gj1pTzgVMcT5ZMkKeJyeS10
+# YXoWrX6XABbwIYmGbfBv2kqWE1HGp3oWj5pRQtZ4XjHOMG2r2I0JK3btZZ5yktRH
+# izjXhPHb4rLZoeqd9eujG1IFSHb1Y6DWSFVVbCYEIV6s4f1FSYJvaYGYs40bK7Kh
+# rgy2by4XJ9SYt8yVYDpLW+CQqcp5JDK3i1tZTqFynl/dY+HRZAtzZUMAoYIDTDCC
 # A0gGCSqGSIb3DQEJBjGCAzkwggM1AgEBMIGSMH0xCzAJBgNVBAYTAkdCMRswGQYD
 # VQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNV
 # BAoTD1NlY3RpZ28gTGltaXRlZDElMCMGA1UEAxMcU2VjdGlnbyBSU0EgVGltZSBT
 # dGFtcGluZyBDQQIRAJA5f5rSSjoT8r2RXwg4qUMwDQYJYIZIAWUDBAICBQCgeTAY
-# BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMzAzMjQy
-# MDI1NTNaMD8GCSqGSIb3DQEJBDEyBDDGWbI0eBXjLaF85xjgP9PFzCMkuJ0ctGfj
-# tlNAHaKu/8PJs1121T8MPYvxsfx88ecwDQYJKoZIhvcNAQEBBQAEggIAGr9ayfRu
-# vScwWLgcPB6U55J/SQEFHIxIppYAz/9HqCi3Y+PzU5oNYX2OI8WPh0NwYl+xKfIG
-# f2Lhw2LaGIVVPvRWcBmOpWt5k4KFbDX+nhQeDYUUIOwvCZkhUsq+PX0aBzT/CiGD
-# sGvs9S/j/OqSZLCM9563ScE166/KvPLzFpDARTfIHlvP0/pxwbwzD3+7QztbLxGr
-# PVlMLmHiLi++u73JxUrPEmJPV5734GvlkU4hvH8UQdXgyv9pzcnHrXhhfx4RBPe8
-# XbxlrslW2MdjkTKVnZvKF1yCPVOg3so7dvw30eS+wLCABrY136PpXsIx9lvyPcXF
-# m8NgmWWj2+isxx/uzj/BGKZViQuYVEkdzeL+CXF4nIfpr1JjD2EVae39Uyigrthg
-# 59cNYASpwwsEHlQkWsSFbxOBRalCA7V3fYiMiMspaF5wZaFTSCeW7VljUxNavS9u
-# 9RmQKLx4L83TyxeDAkxGp7LZJbzJ669IWBb8ujN0VIIzj5YoaEHQpd71xHVe8UuF
-# X4w0RacQOh7YSjj04n+IfNCZbUFmUXBvm4shuclSDcx9T66kr8vBHPWUXHMLGWnG
-# ymvdUEx8DVG3FsQ8yPEvGwnqwWFtLc6isHNoO8Qp8liZ0M6Ji544Enh6Ci2eBNQr
-# zw5EJQ+iLmVgrLvZH2D5akYkJd7QJDfnLDI=
+# BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMzA1MDIx
+# NjM0MjZaMD8GCSqGSIb3DQEJBDEyBDAtniSR7Vfej+AYEFQZ3+NBJQAXNAt/HwbI
+# 5+n2OyqYKwn+HappIIcZ10+Nrw278d4wDQYJKoZIhvcNAQEBBQAEggIAMvgtwq5H
+# IujfCV5dpKdxFkvur2UdjdH4U31oa8qYfE+/g1a82SYoLYoRgyOEdPq149bH6zd6
+# FAisZ0nRP5G33mBNW/B1l7CsMdS6s5hE8iTlLZ3rupIqABgnNdYGZi1RIRHb6fFw
+# 6FFqGFGt3j9YxjG1ro2DuErloQjZrLK5GT3zh8mM2WOIcQxbQ6IEDOV3OD1enIUR
+# xqWS1knQF6mKmGjz76Kz418NnTHw0GbUxitM8fkvJq4IKXUc+zZpzOnzI3wL06mV
+# yOsWOFbGUmfM9804VDfByIUxyYMCP/U4uhV87fXa84LFF2eMvzfmfbJ4rnq52+cw
+# H5Q57IVwvSDnjmxNTcG7QqcO2gpx+0x24R2GYO8R1uNES5FjMH67GC+n5UBWP3Cr
+# howGj266rjj7Bx03+Ut5MD9qWpsNHnLIAeoqXRqwoTM6owzyaz6P0ePeGywAgqhp
+# uMyAPBt8N/1iDWR+4bM52UdsEuvGVJk/rVyEWoaWTZ5anIaXvOaUb794dYFAVn0p
+# c3yAfGFu/a2qRWnq1A1KVBtla5tZhEs/jT+qqYBkUw/uSY8gMf7ChKVaB73xoams
+# r+bedGug/G0+G12UmPASqbhzaEsoPmUo35VvhiqN8+eX08JWY5iWY0lByydG5p/z
+# 2YKgpIYFzF3NCsg7ZDNp+NSsOe0Sqjfb2wk=
 # SIG # End signature block
